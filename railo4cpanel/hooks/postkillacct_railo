@@ -1,0 +1,102 @@
+##############################################################################
+# package:              postkillacct_railo
+# author:               Jordan Michaels (jordan@viviotech.net)
+# license:              LGPL 3.0
+#                       http://www.opensource.org/licenses/lgpl-3.0.html
+#
+##############################################################################
+my %OPTS = @ARGV;
+my $username = $OPTS{'user'};
+
+print "\n";
+&rebuildapache;
+&clearmemory;
+&restartrailo;
+
+sub rebuildapache {
+        # need to rebuild Apache to make sure new Railo configs take effect
+
+        # customize command if needed...
+        my $rebuildcommand ='/scripts/rebuildhttpdconf';
+
+        # if the apache rebuild script exists, run it
+        if ( -e $rebuildcommand ) {
+                # capture the response from both STDOUT and STDERR
+                print "  [RAILO] attampting to rebuild Apache config...";
+                my $rebuildresponse = `$rebuildcommand 2>&1`;
+                my $commandsuccessful = $?;
+
+                if (  $commandsuccessful == 0 ) {
+                        print "[SUCCESS]\n";
+                } else {
+                        print "[FAIL]\n";
+                        print "  [RAILO] Command Response:\n";
+                        print "  [RAILO] Response Code: $commandsuccessful\n";
+                        print "  [RAILO] $rebuildresponse\n";
+                }
+        } else {
+                print "  [RAILO] Error: Cannot find $rebuildcommand !\n";
+        }
+}
+
+sub clearmemory {
+        # this subroutine clears out the systems buffers to give Railo/Tomcat
+        # the best chance of restarting
+        print "  [RAILO] Flushing out memory buffers...";
+
+        my $cmd="sync; echo 3 > /proc/sys/vm/drop_caches";
+        my $result = `$cmd`;
+        if ( $? == 0 ) {
+                print "[SUCCESS]\n";
+        } else {
+                print "[FAIL]\n";
+                print "  [RAILO] Command Attempted: '$cmd'\n";
+                print "  [RAILO] Command Failure: $!\n";
+                print "  [RAILO] Command Code: $?\n";
+                print "  [RAILO] Command Response: $result\n";
+        }
+
+}
+
+sub restartrailo {
+        # need to restart railo to clear out this site from the railo config
+        print "  [RAILO] Shutting down Railo Server...";
+	my $cmd="/opt/railo/railo_ctl forcequit";
+        my $result = `$cmd`;
+        if ( $? == 0 ) {
+                print "[SUCCESS]\n";
+        } else {
+                print "[FAIL]\n";
+                print "  [RAILO] Command Attempted: '$cmd'\n";
+                print "  [RAILO] Command Failure: $!\n";
+                print "  [RAILO] Command Code: $?\n";
+                print "  [RAILO] Command Response: $result\n";
+        }
+
+        sleep(2);
+
+        print "  [RAILO] Scheduling Railo Server startup...";
+
+	# We use cron to do the start below because for whatever reason, Railo will not
+	# properly when the start command is issued via PERL, so we issue the start cmd
+	# via crontab instead.
+	#
+	# command breakdown:
+	# crontab -l lists out the existing crontab before we add our start line
+	# echo adds the rather complex cronjob to run every minute (so railo server starts back up as quickly as possible
+	# inside the cronjob itself is the Railo restart command
+	# then we list out the cron job list and remove the last line with sed (the line that contains our start cmd)
+	# save the new crontab and remove the tmp file we created
+	
+	my $cmd="(crontab -l ; echo \"* * * * * /opt/railo/railo_ctl start;crontab -l > crontab.tmp;sed -i '\$ d' crontab.tmp;cat crontab.tmp | crontab - ;rm -f crontab.tmp\") | crontab -";
+        my $result = `$cmd`;
+        if ( $? == 0 ) {
+                print "[SUCCESS]\n";
+        } else {
+                print "[FAIL]\n";
+                print "  [RAILO] Command Attempted: '$cmd'\n";
+                print "  [RAILO] Command Failure: $!\n";
+                print "  [RAILO] Command Code: $?\n";
+                print "  [RAILO] Command Response: $result\n";
+        }
+}
