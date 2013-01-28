@@ -1,4 +1,33 @@
 The Railo4cPanel project makes it easy for any hosting company to offer Railo
-as a value-added service to their cPanel services. Set your hosting company
-apart from the hosting crowd and give your clients the gift of the
-open-source CFML language!
+as a value-added service to their cPanel services.
+
+Set your hosting company apart from the hosting crowd and give your clients
+the gift of the open-source CFML language!
+
+###############################################################################
+
+Building Railo4cPanel:
+
+To build the Railo4cPanel .run file, download this repository and run the
+following command on any CentOS-based server:
+
+# cd railo4cpanel/
+# ./make_railo4cpanel.sh
+
+This will produce a self-extracting Railo4cPanel installer that you may run
+on any system that has WHM/cPanel 11.34 installed on it. Other versions of
+WHM/cPanel may function, but only 11.34 has been tested so far.
+
+###############################################################################
+
+Support:
+
+Free support for Railo4cPanel is available through the Railo Community. Please
+post questions to the Railo Mailing List:
+
+http://groups.google.com/group/railo
+
+Commercial Support through Railo Technologies is also available should you
+require direct support from a Railo System Administrator:
+
+http://www.getrailo.com/
