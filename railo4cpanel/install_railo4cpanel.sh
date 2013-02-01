@@ -20,7 +20,7 @@
 #
 ###############################################################################
 
-version=1.0;
+version=0.1;
 progname=$(basename $0);
 basedir=$( cd "$( dirname "$0" )" && pwd );
 
@@ -283,9 +283,17 @@ function test_input {
         if [ $debug ]; then
                 echo "* [DEBUG] tomcat password length reported as: $myTCPWLength";
         fi
-	if [[ $myTCPWLength -lt 6  ]]; then
+	if [[ $myTCPWLength -lt 6 ]]; then
 		echo "";
-                echo "* [FATAL] Tomcat Password much be 6 characters or more!";
+                echo "* [FATAL] Railo/Tomcat Password much be 6 characters or more!";
+                echo "* Type '$progname --help' for usage information";
+                echo "";
+                exit 1;
+	fi
+	if [[ ! $myTomcatPass =~ ^[A-Za-z0-9_]*$ ]]; then
+                echo "";
+                echo "* [FATAL] Railo/Tomcat Password may only contain letters,";
+		echo "          numbers, and underscores.";
                 echo "* Type '$progname --help' for usage information";
                 echo "";
                 exit 1;
@@ -1212,7 +1220,7 @@ function start_install_mode {
                 read -s -p "Enter desired Tomcat/Railo Password (6+ characters): " myPassword1;
                 echo "";
                 local myTCPWLength=`echo "${#myPassword1}"`;
-                if [[ ! $myTCPWLength -ge 6 ]] || [[ ! $myPassword1 =~ ^[A-Za-z][A-Za-z0-9_]*$ ]]; then
+                if [[ ! $myTCPWLength -ge 6 ]] || [[ ! $myPassword1 =~ ^[A-Za-z0-9_]*$ ]]; then
                         echo "Incompatible Password. Please try again.";
                         echo " - Passwords must be 6+ characters.";
                         echo " - Passwords may only contain letters, numbers, and underscores.";
