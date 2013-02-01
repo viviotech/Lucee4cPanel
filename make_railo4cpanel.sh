@@ -18,7 +18,7 @@
 #
 ###############################################################################
 
-version=1.0;
+version=0.1;
 progname=$(basename $0);
 basedir=$( cd "$( dirname "$0" )" && pwd );
 
@@ -33,7 +33,7 @@ if [ ! $(id -u) = "0" ]; then
 fi
 
 # set creation variables
-myInstallerVersion="0.1.00"
+myInstallerVersion="0.1.01"
 
 
 ###############################################################################
